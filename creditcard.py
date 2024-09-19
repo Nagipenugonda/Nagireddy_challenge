@@ -1,32 +1,40 @@
-# used this for reajx ^(?!.*(\d)\1{3})([456]\d{3}-\d{4}-\d{4}-\d{4}|[456]\d{15})$
-
-#code
-
 import re
 
-def is_valid_credit_card(card):
-    # Regex pattern to match the valid credit card rules
-    pattern = r'^[456](\d{15}|\d{3}-(\d{4}-){2}\d{4})$'
-    # Check if the card matches the pattern
-    if not re.match(pattern, card):
-        return "Invalid"
+def validate_credit_card(cards):
+    # Regex pattern to match valid credit card format
+    pattern = re.compile(r"^(?!.*(\d)\1{3})([456]\d{3}-\d{4}-\d{4}-\d{4}|[456]\d{15})$")
+    results = []
     
-    # Remove all hyphens for further checking
-    card = card.replace('-', '')
+    for card in cards:
+        card = card.replace(" ", "")  # Remove spaces
+        if pattern.match(card):
+            # Remove all hyphens for further checking
+            card_number = card.replace('-', '')
+            
+            # Check for four or more consecutive repeated digits
+            if re.search(r'(\d)\1{3,}', card_number):
+                results.append("Invalid")
+            else:
+                results.append("Valid")
+        else:
+            results.append("Invalid")
     
-    # Check for four or more consecutive repeated digits
-    if re.search(r'(\d)\1{3,}', card):
-        return "Invalid"
-    
-    return "Valid"
+    return results
 
-# Read input
-n = int(input())
-credit_cards = [input().strip() for _ in range(n)]
+# Sample Input
+input_data = [
+    "4123456789123456",
+    "5123-4567-8912-3456",
+    "61234-567-8912-3456",
+    "4123356789123456",
+    "5133-3367-8912-3456",
+    "5123 - 3567 - 8912 - 3456"
+]
 
-# Validate each credit card
-results = [is_valid_credit_card(card) for card in credit_cards]
+# Run validation
+output = validate_credit_card(input_data)
 
-# Print the results
-for result in results:
+# Print results
+for result in output:
     print(result)
+
